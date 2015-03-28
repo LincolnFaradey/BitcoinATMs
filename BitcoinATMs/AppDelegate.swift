@@ -1,9 +1,9 @@
 //
 //  AppDelegate.swift
-//  BitcoinATMs
+//  BitcoinExchange
 //
-//  Created by Andrei Nechaev on 3/24/15.
-//  Copyright (c) 2015 Andrei Nechaev. All rights reserved.
+//  Created by Andrey on 15.02.15.
+//  Copyright (c) 2015 Andrei. All rights reserved.
 //
 
 import UIKit
