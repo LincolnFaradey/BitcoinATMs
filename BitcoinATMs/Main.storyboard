@@ -56,7 +56,7 @@
                                     </mask>
                                 </variation>
                             </textField>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="iqP-Dt-uIA">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0.0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="iqP-Dt-uIA">
                                 <rect key="frame" x="0.0" y="-21" width="42" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="iqP-Dt-uIA" secondAttribute="height" multiplier="23:3" id="zUy-53-THI"/>
@@ -130,7 +130,7 @@
                                 </connections>
                             </button>
                         </subviews>
-                        <color key="backgroundColor" red="0.7019608021" green="0.09803922474" blue="0.1176470667" alpha="1" colorSpace="deviceRGB"/>
+                        <color key="backgroundColor" red="0.14901961386203766" green="0.72156864404678345" blue="0.9490196704864502" alpha="1" colorSpace="deviceRGB"/>
                         <constraints>
                             <constraint firstItem="cGd-jt-G8M" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" constant="-16" id="3Kb-nu-UxU"/>
                             <constraint firstItem="iqP-Dt-uIA" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" id="4Yz-pk-txE"/>
@@ -144,7 +144,9 @@
                                 <variation key="widthClass=compact" constant="18"/>
                             </constraint>
                             <constraint firstAttribute="trailingMargin" secondItem="cGd-jt-G8M" secondAttribute="trailing" constant="-16" id="Kt0-qq-eXw"/>
-                            <constraint firstAttribute="centerY" secondItem="iqP-Dt-uIA" secondAttribute="centerY" constant="53.5" id="QO3-RI-ENG"/>
+                            <constraint firstAttribute="centerY" secondItem="iqP-Dt-uIA" secondAttribute="centerY" constant="53.5" id="QO3-RI-ENG">
+                                <variation key="widthClass=compact" constant="54"/>
+                            </constraint>
                             <constraint firstItem="3Ve-6M-1dE" firstAttribute="trailing" secondItem="kh9-bI-dsS" secondAttribute="trailingMargin" id="Uee-Xx-t8p"/>
                             <constraint firstAttribute="centerX" secondItem="Dyv-HK-pax" secondAttribute="centerX" id="WAb-bd-Wnu"/>
                             <constraint firstItem="iqP-Dt-uIA" firstAttribute="trailing" secondItem="kh9-bI-dsS" secondAttribute="trailingMargin" id="cKj-SW-H4V"/>

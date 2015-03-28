@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		7F2D6B9D1AC11F0A00525E03 /* BitcoinATMsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F2D6B9C1AC11F0A00525E03 /* BitcoinATMsTests.swift */; };
 		7F2D6BB31AC11F7E00525E03 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F2D6BA61AC11F7E00525E03 /* ViewController.swift */; };
-		7F2D6BB41AC11F7E00525E03 /* BitSingleton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F2D6BA71AC11F7E00525E03 /* BitSingleton.swift */; };
 		7F2D6BB51AC11F7E00525E03 /* AdditionalCurrenciesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F2D6BA81AC11F7E00525E03 /* AdditionalCurrenciesViewController.swift */; };
 		7F2D6BB61AC11F7E00525E03 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F2D6BA91AC11F7E00525E03 /* WebViewController.swift */; };
 		7F2D6BB71AC11F7E00525E03 /* BitMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F2D6BAA1AC11F7E00525E03 /* BitMapViewController.swift */; };
@@ -40,7 +39,6 @@
 		7F2D6B9B1AC11F0A00525E03 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7F2D6B9C1AC11F0A00525E03 /* BitcoinATMsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitcoinATMsTests.swift; sourceTree = "<group>"; };
 		7F2D6BA61AC11F7E00525E03 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		7F2D6BA71AC11F7E00525E03 /* BitSingleton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BitSingleton.swift; sourceTree = "<group>"; };
 		7F2D6BA81AC11F7E00525E03 /* AdditionalCurrenciesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdditionalCurrenciesViewController.swift; sourceTree = "<group>"; };
 		7F2D6BA91AC11F7E00525E03 /* WebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		7F2D6BAA1AC11F7E00525E03 /* BitMapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BitMapViewController.swift; sourceTree = "<group>"; };
@@ -94,7 +92,6 @@
 			isa = PBXGroup;
 			children = (
 				7F2D6BA61AC11F7E00525E03 /* ViewController.swift */,
-				7F2D6BA71AC11F7E00525E03 /* BitSingleton.swift */,
 				7F2D6BA81AC11F7E00525E03 /* AdditionalCurrenciesViewController.swift */,
 				7F2D6BA91AC11F7E00525E03 /* WebViewController.swift */,
 				7F2D6BAA1AC11F7E00525E03 /* BitMapViewController.swift */,
@@ -240,7 +237,6 @@
 			files = (
 				7F2D6BB31AC11F7E00525E03 /* ViewController.swift in Sources */,
 				7F2D6BB51AC11F7E00525E03 /* AdditionalCurrenciesViewController.swift in Sources */,
-				7F2D6BB41AC11F7E00525E03 /* BitSingleton.swift in Sources */,
 				7F2D6BB61AC11F7E00525E03 /* WebViewController.swift in Sources */,
 				7F2D6BBD1AC11F7E00525E03 /* ANDownloader.swift in Sources */,
 				7F2D6BB91AC11F7E00525E03 /* DetailsViewController.swift in Sources */,

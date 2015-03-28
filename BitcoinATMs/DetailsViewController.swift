@@ -77,6 +77,7 @@ class DetailsViewController: UIViewController {
         }
     }
     
+    //MARK: Animation helpers
     func animateRotationWith(imageView: UIImageView, delay: Double, rotation: CGFloat) {
         let fullR = CGFloat(M_PI * 2)
         

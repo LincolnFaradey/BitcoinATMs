@@ -12,19 +12,10 @@ class AdditionalCurrenciesViewController: UIViewController, UIPickerViewDelegate
 
     @IBOutlet weak var currencyPickerView: UIPickerView!
     
-    var variable = 0;
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.currencyPickerView.delegate = self
     }
-    
-        
-    
-    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
-        return 3
-    }
-    
     
     
     //MARK: UIPickerViewDelegate methods
@@ -41,7 +32,6 @@ class AdditionalCurrenciesViewController: UIViewController, UIPickerViewDelegate
         self.currencyPickerView.selectRow(row, inComponent: 0, animated: true)
         self.currencyPickerView.selectRow(row, inComponent: 1, animated: true)
         self.currencyPickerView.selectRow(row, inComponent: 2, animated: true)
-        variable = row
     }
     
     func pickerView(pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusingView view: UIView!) -> UIView {
@@ -63,6 +53,12 @@ class AdditionalCurrenciesViewController: UIViewController, UIPickerViewDelegate
         }
     }
     
+    //MARK: UIPickerViewDataSource
+    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
+        return 3
+    }
+    
+    //MARK: IBActions
     @IBAction func addCurrency(sender: UIButton) {
         sender.tag = 111
     }
@@ -72,9 +68,9 @@ class AdditionalCurrenciesViewController: UIViewController, UIPickerViewDelegate
             if (sender as! UIButton).tag == 111 {
                 
                 let vc = segue.destinationViewController as! ViewController
-                if !contains(vc.values, variable) {
+                if !contains(vc.values, self.currencyPickerView.selectedRowInComponent(0)) {
                     
-                    vc.values.append(self.variable)
+                    vc.values.append(self.currencyPickerView.selectedRowInComponent(0))
                     let userDefaults = NSUserDefaults.standardUserDefaults()
                     userDefaults.setObject(vc.values, forKey: "Values")
                 }

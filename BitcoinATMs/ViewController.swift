@@ -22,42 +22,33 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     
     var thePrice: NSNumber = 0.0
     
-    var values: [Int] = [0]
+    var values: [Int] = [149]
     
     let colors: [UIColor] = [
         UIColor(hue:0.565, saturation:0.870, brightness:1, alpha: 1),
         UIColor(hue:0.500, saturation:0.745, brightness:0.7, alpha: 1),
-        UIColor(hue:0.639, saturation:0.813, brightness:0.988, alpha: 1)
+        UIColor(hue:0.500, saturation:0.813, brightness:0.788, alpha: 1)
     ]
     var currencySym: String!
     
-    
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        var i = 0
-        for cur in currencies {
-            println("\(cur) \(i)")
-            ++i
-        }
-        
         
         let userDefaults = NSUserDefaults.standardUserDefaults()
         
         let array = userDefaults.objectForKey("Values") as? [Int]
         if array?.count > 0 {
             values = array!
-            println(values)
         }
-        let val = values[0]
-        self.getPrice(currencies[val])
-        self.view.backgroundColor = colors[0]
-        self.currencySym = symbols[0]
+        
+        self.getPrice(currencies[values[0]])
+        self.currencySym = symbols[values[0]]
         
         self.currencyPicker.delegate = self
         self.currencyPicker.dataSource = self
         self.currencyCalculatorTextField.delegate = self
-        self.currencyCalculatorTextField.addTarget(self, action: Selector("textFieldDidChange:"), forControlEvents: UIControlEvents.EditingChanged)
+        self.currencyCalculatorTextField.addTarget(self, action: Selector("textFieldDidChange:"), forControlEvents:.EditingChanged)
+        
         hideViewFields()
     }
     
@@ -163,13 +154,12 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     
     
     //MARK: Helper methods
-    
     func hideViewFields() {
         self.currencyPrice.center.x += self.view.bounds.width
         self.currencyPicker.alpha = 0.0
         self.currencyPrice.alpha = 0.0
         self.avergPriceLabel.alpha = 0.0
-        
+        self.currencyCalculatorLabel.alpha = 0.0;
         self.currencyCalculatorTextField.alpha = 0.0
         self.currencyCalculatorTextField.backgroundColor = self.view.backgroundColor
     }
@@ -212,7 +202,7 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         if !currencyCalculatorTextField.text.isEmpty {
                 self.textFieldDidChange(self.currencyCalculatorTextField);
         }
-        self.currencyCalculatorLabel.text = ""
+        self.currencyCalculatorLabel.text = "0.0"
         UIView.animateWithDuration(0.5, animations: { () -> Void in
             self.currencyPicker.alpha = 0.0
             self.currencyPrice.alpha = 0.0
