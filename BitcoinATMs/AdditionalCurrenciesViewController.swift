@@ -12,10 +12,19 @@ class AdditionalCurrenciesViewController: UIViewController, UIPickerViewDelegate
 
     @IBOutlet weak var currencyPickerView: UIPickerView!
     
+    var value = 0;
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.currencyPickerView.delegate = self
     }
+    
+        
+    
+    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
+        return 3
+    }
+    
     
     
     //MARK: UIPickerViewDelegate methods
@@ -32,6 +41,7 @@ class AdditionalCurrenciesViewController: UIViewController, UIPickerViewDelegate
         self.currencyPickerView.selectRow(row, inComponent: 0, animated: true)
         self.currencyPickerView.selectRow(row, inComponent: 1, animated: true)
         self.currencyPickerView.selectRow(row, inComponent: 2, animated: true)
+        value = row
     }
     
     func pickerView(pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusingView view: UIView!) -> UIView {
@@ -40,6 +50,7 @@ class AdditionalCurrenciesViewController: UIViewController, UIPickerViewDelegate
         case 0, 1:
             let frame = CGRectMake(0, 0, 50, 50)
             let label = UILabel(frame: frame)
+            label.font = UIFont(name: "HelveticaNeue-Thin", size: 22)
             label.text = component == 0 ? currencies[row] : symbols[row]
             return label
         default:
@@ -53,12 +64,6 @@ class AdditionalCurrenciesViewController: UIViewController, UIPickerViewDelegate
         }
     }
     
-    //MARK: UIPickerViewDataSource
-    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
-        return 3
-    }
-    
-    //MARK: IBActions
     @IBAction func addCurrency(sender: UIButton) {
         sender.tag = 111
     }
@@ -68,9 +73,9 @@ class AdditionalCurrenciesViewController: UIViewController, UIPickerViewDelegate
             if (sender as! UIButton).tag == 111 {
                 
                 let vc = segue.destinationViewController as! ViewController
-                if !contains(vc.values, self.currencyPickerView.selectedRowInComponent(0)) {
+                if !contains(vc.values, value) {
                     
-                    vc.values.append(self.currencyPickerView.selectedRowInComponent(0))
+                    vc.values.append(self.value)
                     let userDefaults = NSUserDefaults.standardUserDefaults()
                     userDefaults.setObject(vc.values, forKey: "Values")
                 }

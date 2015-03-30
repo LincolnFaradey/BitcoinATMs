@@ -20,22 +20,31 @@ class BitMapViewController: UIViewController, MKMapViewDelegate, CLLocationManag
     var distance: CLLocationDistance!
     var isUpdated: Bool = false
     
-    var my_set: Set<String>?
+    var my_set: NSMutableSet?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         self.mapView.showsUserLocation = true
         self.mapView.delegate = self
 
         transportTypeControl.alpha = 0.0
         locateButton.alpha = 0.0
-        distanceLabel.alpha = 0.0
-        
         locationManager.delegate = self
+        distanceLabel.alpha = 0.0
         locationManager.requestWhenInUseAuthorization()
+        locationManager.requestAlwaysAuthorization()
         
-        self.createTestPin()
+        //TEST
+        let item = BitMapItem(type: "BlaBLa", latitude: NSDecimalNumber(string:"55.776062"), longitude: NSDecimalNumber(string:"37.572070"), url: "http://google.com", isTwoWay: true, bitTypes: NSDictionary(dictionary: ["bitcoin" : "1",
+            "litecoin" : "1",
+            "dogecoin" : "1"]))
+        let pointAnnotation = BitPointAnnotation()
+        pointAnnotation.coordinate = CLLocationCoordinate2DMake(item.latitude.doubleValue, item.longitude.doubleValue)
+        pointAnnotation.title = item.type
+        pointAnnotation.url = NSURL(string: item.url)
+        pointAnnotation.isTwoWay = item.is_two_way
+        pointAnnotation.types = item.bit_types
+        self.mapView.addAnnotation(pointAnnotation);
     }
 
     
@@ -43,13 +52,14 @@ class BitMapViewController: UIViewController, MKMapViewDelegate, CLLocationManag
         super.didReceiveMemoryWarning()
     }
     
-    //MARK: loading data
+    //MARK: loading JSON data 
     func loadCoordinates() {
         let userDefaults = NSUserDefaults.standardUserDefaults()
         let json = userDefaults.objectForKey("mapData") as? NSDictionary
         if json != nil {
             self.loadDataWith(json!)
         }else {
+            println("Not there")
             ANDownloader.getJSONFromURL(url: map_url) { (data: NSData?, alertController: UIAlertController?) -> () in
                 if alertController != nil {
                     self.presentViewController(alertController!, animated: true, completion: nil)
@@ -89,6 +99,7 @@ class BitMapViewController: UIViewController, MKMapViewDelegate, CLLocationManag
         }
 
         pinView.leftCalloutAccessoryView = createButtonWithRect(CGRectMake(pinView.frame.origin.x, pinView.frame.origin.y, 23, 23), image:UIImage(named: "route")!, tag: 201)
+
         pinView.rightCalloutAccessoryView = createButtonWithRect(CGRectMake(pinView.frame.origin.x, pinView.frame.origin.y, 23, 23), image:UIImage(named: "info")!, tag: 202)
         
         return pinView
@@ -117,7 +128,45 @@ class BitMapViewController: UIViewController, MKMapViewDelegate, CLLocationManag
         
     }
     
-    //MARK: User Navigation
+
+    //MARK: helpers
+    func loadDataWith(json: NSDictionary) {
+        self.my_set = NSMutableSet()
+        json.enumerateKeysAndObjectsUsingBlock({ (key: AnyObject!, value: AnyObject!, tmp: UnsafeMutablePointer<ObjCBool>) -> Void in
+            if value.isKindOfClass(NSDictionary) {
+                let twValue = value["is_twoway"] as! NSNumber
+                
+                let item = BitMapItem(type: value["type"] as! String,
+                    latitude: NSDecimalNumber(string: value["lat"] as? String),
+                    longitude: NSDecimalNumber(string: value["long"] as? String),
+                    url: value["url"] as! String,
+                    isTwoWay: twValue == 1 ? true : false,
+                    bitTypes: value["cryptos"] as! NSDictionary
+                )
+                
+                self.my_set!.addObject(item.type)
+                self.addAnnotationWith(item: item)
+            }
+        })
+    }
+    
+    func addAnnotationWith(#item: BitMapItem) {
+        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+            let pointAnnotation = BitPointAnnotation()
+            pointAnnotation.coordinate = CLLocationCoordinate2DMake(item.latitude.doubleValue, item.longitude.doubleValue)
+            
+            
+            if (pointAnnotation.coordinate.longitude - self.locationManager.location.coordinate.longitude < 0.5)  && (pointAnnotation.coordinate.longitude - self.locationManager.location.coordinate.longitude > -0.5) &&
+                (pointAnnotation.coordinate.latitude - self.locationManager.location.coordinate.latitude < 0.5)  && (pointAnnotation.coordinate.latitude - self.locationManager.location.coordinate.latitude > -0.5){
+                    pointAnnotation.title = item.type
+                    pointAnnotation.url = NSURL(string: item.url)
+                    pointAnnotation.isTwoWay = item.is_two_way
+                    pointAnnotation.types = item.bit_types
+                    self.mapView.addAnnotation(pointAnnotation);
+            }
+        })
+    }
+    
     func getDirection() {
         UIView.animateWithDuration(0.4, animations: { () -> Void in
             self.transportTypeControl.alpha = 1.0
@@ -157,92 +206,6 @@ class BitMapViewController: UIViewController, MKMapViewDelegate, CLLocationManag
         }
     }
     
-    
-    // MARK: IBActions
-    @IBAction func focusOnUser(sender: UIButton) {
-        if (locationManager.location == nil) { return }
-        let region: MKCoordinateRegion = MKCoordinateRegion(center: CLLocationCoordinate2DMake(locationManager.location.coordinate.latitude,
-            locationManager.location.coordinate.longitude),
-            span: MKCoordinateSpanMake(0.01, 0.01))
-        
-        UIView.animateWithDuration(0.6, animations: { () -> Void in
-             self.mapView.region = region
-        })
-        
-        self.mapView.setUserTrackingMode(MKUserTrackingMode.FollowWithHeading, animated: true)
-    }
-    
-    @IBAction func transportType(sender: UISegmentedControl) {
-        getDirection()
-    }
-    
-    
-    //MARK: UI Navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if sender!.isKindOfClass(BitPointAnnotation) {
-            let controller = segue.destinationViewController as! DetailsViewController
-            
-            controller.webPage =  (sender as! BitPointAnnotation).url!
-            controller.isTwoWay  = (sender as! BitPointAnnotation).isTwoWay! ? "YES" : "NO"
-            controller.bitTypes = (sender as! BitPointAnnotation).types
-        }
-    }
-    
-    //MARK: Create test annotation
-    func createTestPin() {
-        let item = BitMapItem(type: "BlaBLa", latitude: NSDecimalNumber(string:"55.776062"), longitude: NSDecimalNumber(string:"37.572070"), url: "http://google.com", isTwoWay: true, bitTypes: NSDictionary(dictionary: ["bitcoin" : "1",
-            "litecoin" : "1",
-            "dogecoin" : "1"]))
-        
-        let pointAnnotation = BitPointAnnotation()
-        pointAnnotation.coordinate = CLLocationCoordinate2DMake(item.latitude.doubleValue, item.longitude.doubleValue)
-        pointAnnotation.title = item.type
-        pointAnnotation.url = NSURL(string: item.url)
-        pointAnnotation.isTwoWay = item.is_two_way
-        pointAnnotation.types = item.bit_types
-        self.mapView.addAnnotation(pointAnnotation);
-    }
-    
-    
-    //MARK: helpers
-    
-    func loadDataWith(json: NSDictionary) {
-        self.my_set = Set()
-        json.enumerateKeysAndObjectsUsingBlock({ (key: AnyObject!, value: AnyObject!, tmp: UnsafeMutablePointer<ObjCBool>) -> Void in
-            if value.isKindOfClass(NSDictionary) {
-                let twValue = value["is_twoway"] as! NSNumber
-                
-                let item = BitMapItem(type: value["type"] as! String,
-                    latitude: NSDecimalNumber(string: value["lat"] as? String),
-                    longitude: NSDecimalNumber(string: value["long"] as? String),
-                    url: value["url"] as! String,
-                    isTwoWay: twValue == 1 ? true : false,
-                    bitTypes: value["cryptos"] as! NSDictionary
-                )
-                
-                self.my_set!.insert(item.type)
-                self.addAnnotationWith(item: item)
-            }
-        })
-    }
-    
-    func addAnnotationWith(#item: BitMapItem) {
-        dispatch_async(dispatch_get_main_queue(), { () -> Void in
-            let pointAnnotation = BitPointAnnotation()
-            pointAnnotation.coordinate = CLLocationCoordinate2DMake(item.latitude.doubleValue, item.longitude.doubleValue)
-            
-            
-            if (pointAnnotation.coordinate.longitude - self.locationManager.location.coordinate.longitude < 0.5)  && (pointAnnotation.coordinate.longitude - self.locationManager.location.coordinate.longitude > -0.5) &&
-                (pointAnnotation.coordinate.latitude - self.locationManager.location.coordinate.latitude < 0.5)  && (pointAnnotation.coordinate.latitude - self.locationManager.location.coordinate.latitude > -0.5){
-                    pointAnnotation.title = item.type
-                    pointAnnotation.url = NSURL(string: item.url)
-                    pointAnnotation.isTwoWay = item.is_two_way
-                    pointAnnotation.types = item.bit_types
-                    self.mapView.addAnnotation(pointAnnotation);
-            }
-        })
-    }
-    
     func animateDistance() {
         distanceLabel.center.y -= view.bounds.height
         view.setNeedsUpdateConstraints()
@@ -262,7 +225,29 @@ class BitMapViewController: UIViewController, MKMapViewDelegate, CLLocationManag
         button.setImage(image, forState: UIControlState.Normal)
         button.contentMode = UIViewContentMode.ScaleAspectFit
         button.tag = tag
-        
+
         return button
+    }
+    
+    
+    // MARK: IBActions
+    @IBAction func focusOnUser(sender: UIButton) {
+        if (locationManager.location == nil) { return }
+        
+        self.mapView.setUserTrackingMode(MKUserTrackingMode.FollowWithHeading, animated: true)
+    }
+    
+    @IBAction func transportType(sender: UISegmentedControl) {
+        getDirection()
+    }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if sender!.isKindOfClass(BitPointAnnotation) {
+            let controller = segue.destinationViewController as! DetailsViewController
+            
+            controller.webPage =  (sender as! BitPointAnnotation).url!
+            controller.isTwoWay  = (sender as! BitPointAnnotation).isTwoWay! ? "YES" : "NO"
+            controller.bitTypes = (sender as! BitPointAnnotation).types
+        }
     }
 }

@@ -28,6 +28,7 @@ class DetailsViewController: UIViewController {
         self.view.layer.contents = UIImage(named: "Lamassu")?.CGImage
         self.view.layer.contentsGravity = kCAGravityResizeAspect
         
+        let bImage = CIImage(image: self.bitcoinImageView.image!)
 
         self.bitcoinImageView.center.x += self.view.bounds.width
         self.litecoinImageView.center.x += self.view.bounds.width
@@ -42,7 +43,7 @@ class DetailsViewController: UIViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated);
         twoWayLabel.text = isTwoWay
-        self.hasCurrency()
+         self.hasCurrency()
 
         self.twoWayLabel.textColor = isTwoWay == "YES" ? UIColor.greenColor() : UIColor.redColor()
     }
@@ -77,11 +78,10 @@ class DetailsViewController: UIViewController {
         }
     }
     
-    //MARK: Animation helpers
     func animateRotationWith(imageView: UIImageView, delay: Double, rotation: CGFloat) {
         let fullR = CGFloat(M_PI * 2)
         
-        UIView.animateKeyframesWithDuration(1.5, delay: delay, options: UIViewKeyframeAnimationOptions.CalculationModeCubicPaced, animations: { () -> Void in
+        UIView.animateKeyframesWithDuration(1.5, delay: delay, options: UIViewKeyframeAnimationOptions.CalculationModePaced, animations: { () -> Void in
             UIView.addKeyframeWithRelativeStartTime(0.0, relativeDuration: 0.0, animations: { () -> Void in
                 imageView.transform = CGAffineTransformMakeRotation(1/3 * fullR * rotation)
             })
@@ -95,7 +95,7 @@ class DetailsViewController: UIViewController {
     }
     
     func animateAppearence(imageView: UIImageView, delay: Double) {
-        UIView.animateWithDuration(1.5, delay: delay, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
+        UIView.animateWithDuration(1.5, delay: delay, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
             imageView.alpha = 1.0
             imageView.center.x -= self.view.bounds.width
         }, completion: nil)

@@ -9,6 +9,7 @@
 import UIKit
 //TODO: reachability!
 class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate, UITextFieldDelegate {
+    var isCalculating = false
     
     @IBOutlet weak var currencyPrice: UILabel!
     @IBOutlet weak var currencyPicker: UIPickerView!
@@ -20,6 +21,8 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     @IBOutlet weak var currencyCalculatorTextField: UITextField!
     @IBOutlet weak var currencyCalculatorLabel: UILabel!
     
+    @IBOutlet weak var calcWidthConstraint: NSLayoutConstraint!
+    
     var thePrice: NSNumber = 0.0
     
     var values: [Int] = [149]
@@ -27,9 +30,11 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     let colors: [UIColor] = [
         UIColor(hue:0.565, saturation:0.870, brightness:1, alpha: 1),
         UIColor(hue:0.500, saturation:0.745, brightness:0.7, alpha: 1),
-        UIColor(hue:0.500, saturation:0.813, brightness:0.788, alpha: 1)
+        UIColor(hue:0.599, saturation:0.813, brightness:0.988, alpha: 1)
     ]
     var currencySym: String!
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,15 +45,15 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         if array?.count > 0 {
             values = array!
         }
-        
-        self.getPrice(currencies[values[0]])
-        self.currencySym = symbols[values[0]]
+        let val = values[0]
+        self.getPrice(currencies[val])
+        self.view.backgroundColor = colors[0]
+        self.currencySym = symbols[val]
         
         self.currencyPicker.delegate = self
         self.currencyPicker.dataSource = self
         self.currencyCalculatorTextField.delegate = self
-        self.currencyCalculatorTextField.addTarget(self, action: Selector("textFieldDidChange:"), forControlEvents:.EditingChanged)
-        
+        self.currencyCalculatorTextField.addTarget(self, action: Selector("textFieldDidChange:"), forControlEvents: UIControlEvents.EditingChanged)
         hideViewFields()
     }
     
@@ -81,14 +86,14 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         
         NSURLConnection.sendAsynchronousRequest(request, queue: NSOperationQueue.mainQueue()) { (response: NSURLResponse!, data: NSData!, error:NSError!) -> Void in
             if ((data) != nil) {
-            let JSON = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableLeaves, error:nil) as! NSDictionary
+            let JSON = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableLeaves, error:nil) as!NSDictionary
             self.thePrice = JSON["ask"] as! NSNumber
                 
             if  self.thePrice != 0.0 {
                 self.currencyPrice.text = self.currencySym + " " + (NSString().stringByAppendingFormat("%.2f", self.thePrice.doubleValue) as String)
                 let avg = JSON["24h_avg"] as? NSNumber;
                 if (avg != nil) {
-                    self.avergPriceLabel.text = "24h \u{2248} " + self.currencySym + avg!.stringValue
+                    self.avergPriceLabel.text = self.currencySym + avg!.stringValue
                 }
             }
             }else {
@@ -148,19 +153,22 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         frame = CGRectMake(0, 0, 60, 60)
         let myView  = UILabel(frame: frame)
         myView.text = currencies[values[row]]
+        myView.font = UIFont(name: "HelveticaNeue-Thin", size: 22)
         myView.textColor = UIColor.whiteColor()
         return myView
     }
     
     
     //MARK: Helper methods
+    
     func hideViewFields() {
         self.currencyPrice.center.x += self.view.bounds.width
         self.currencyPicker.alpha = 0.0
         self.currencyPrice.alpha = 0.0
         self.avergPriceLabel.alpha = 0.0
-        self.currencyCalculatorLabel.alpha = 0.0;
+        
         self.currencyCalculatorTextField.alpha = 0.0
+        self.currencyCalculatorLabel.alpha = 0.0
         self.currencyCalculatorTextField.backgroundColor = self.view.backgroundColor
     }
     
@@ -175,17 +183,10 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         })
     }
     
-    @IBAction func unwindToSegue(segue: UIStoryboardSegue) {
-        
-    }
     
+    //MARK: UITextFieldDelegate
     func textFieldDidChange(sender: UITextField) {
-        self.currencyCalculatorLabel.text = self.currencySym + " " + toString(self.thePrice.doubleValue * NSDecimalNumber(string: sender.text).doubleValue)
-        if (self.currencyCalculatorLabel.text! as NSString).localizedCaseInsensitiveContainsString("nan") || self.currencyCalculatorTextField.text.isEmpty{
-            self.currencyCalculatorLabel.alpha = 0.0
-        }else {
-            self.currencyCalculatorLabel.alpha = 1.0
-        }
+        self.currencyCalculatorLabel.text = self.currencySym + " " + (NSString().stringByAppendingFormat("%.2f", self.thePrice.doubleValue * NSString(string: sender.text).doubleValue) as String)
     }
     
     func textFieldShouldEndEditing(textField: UITextField) -> Bool {
@@ -202,7 +203,10 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         if !currencyCalculatorTextField.text.isEmpty {
                 self.textFieldDidChange(self.currencyCalculatorTextField);
         }
-        self.currencyCalculatorLabel.text = "0.0"
+        if (self.currencyCalculatorLabel.text! as NSString).localizedCaseInsensitiveContainsString("nan") || self.currencyCalculatorTextField.text.isEmpty{
+            self.currencyCalculatorLabel.text = "0.0"
+        }
+        
         UIView.animateWithDuration(0.5, animations: { () -> Void in
             self.currencyPicker.alpha = 0.0
             self.currencyPrice.alpha = 0.0
@@ -210,17 +214,19 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
             self.addButton.alpha = 0.0
             self.currencyCalculatorLabel.alpha = 1.0
             self.removeButton.alpha = 0.0
+            
+            self.calcWidthConstraint.constant = self.view.bounds.width - 32
+            self.view.layoutIfNeeded()
         })
-    }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        println(__FUNCTION__)
+        
+        isCalculating = true
     }
     
     override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent) {
+        if !isCalculating { return }
+        
         self.currencyCalculatorTextField.resignFirstResponder()
-//        showFields()
+        
         UIView.animateWithDuration(0.5, animations: { () -> Void in
             self.currencyPicker.alpha = 1.0
             self.currencyPrice.alpha = 1.0
@@ -228,8 +234,15 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
             self.addButton.alpha = 1.0
             self.currencyCalculatorLabel.alpha = 0.0
             self.removeButton.alpha = 1.0
+            
+            self.calcWidthConstraint.constant = self.view.bounds.width / 2 - 16
+            self.view.layoutIfNeeded()
         })
+        
+        isCalculating = false
     }
+    
+    //MARK: IBActions
     @IBAction func removeElement(sender: UIButton) {
         let index = self.currencyPicker.selectedRowInComponent(0)
         self.getPrice(currencies[values[self.currencyPicker.selectedRowInComponent(0)]])
@@ -238,6 +251,16 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         userDefaults.setObject(self.values, forKey: "Values")
         self.currencyPicker.reloadAllComponents()
         
+    }
+    
+    @IBAction func unwindToSegue(segue: UIStoryboardSegue) {
+        
+    }
+    
+    //MARK: Memory warnings
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        println(__FUNCTION__)
     }
 }
 
