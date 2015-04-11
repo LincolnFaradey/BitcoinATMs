@@ -11,15 +11,15 @@ import UIKit
 class AdditionalCurrenciesViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
 
     @IBOutlet weak var currencyPickerView: UIPickerView!
+    @IBOutlet weak var addButton: UIButton!
     
     var value = 0;
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.currencyPickerView.delegate = self
+        self.addButton.layer.cornerRadius = 5.0
     }
-    
-        
     
     func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
         return 3
@@ -69,18 +69,6 @@ class AdditionalCurrenciesViewController: UIViewController, UIPickerViewDelegate
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.destinationViewController.isKindOfClass(ViewController) {
-            if (sender as! UIButton).tag == 111 {
-                
-                let vc = segue.destinationViewController as! ViewController
-                if !contains(vc.values, value) {
-                    
-                    vc.values.append(self.value)
-                    let userDefaults = NSUserDefaults.standardUserDefaults()
-                    userDefaults.setObject(vc.values, forKey: "Values")
-                }
-            }
-        }
     }
 
 }

@@ -26,7 +26,7 @@ struct BitMapItem {
     }
 }
 
-let url = NSURL(string: "https://api.bitcoinaverage.com/ticker/global/")
+let url = NSURL(string: "https://api.bitcoinaverage.com/ticker/global")!
 let map_url = NSURL(string: "http://coinatmradar.com/api/locations/2011-02-10/")!
 
 //AED 0
@@ -606,7 +606,7 @@ let flags_: [Int] = [
     79,//egp
     81,//ern
     83,
-    7,
+    7,//eur
     85,
     85,
     90,
@@ -683,7 +683,7 @@ let flags_: [Int] = [
     189,
     191,//ron
     192,
-    193,
+    193,//rub
     194,
     195,
     196,

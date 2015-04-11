@@ -8,259 +8,297 @@
 
 import UIKit
 //TODO: reachability!
-class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate, UITextFieldDelegate {
-    var isCalculating = false
+class ViewController: UIViewController {
+    var isLeftOnScreen = false;
     
-    @IBOutlet weak var currencyPrice: UILabel!
-    @IBOutlet weak var currencyPicker: UIPickerView!
-    @IBOutlet weak var avergPriceLabel: UILabel!
-    @IBOutlet weak var bitcoinLabel: UILabel!
-    @IBOutlet weak var addButton: UIButton!
-    @IBOutlet weak var removeButton: UIButton!
-
-    @IBOutlet weak var currencyCalculatorTextField: UITextField!
-    @IBOutlet weak var currencyCalculatorLabel: UILabel!
+    @IBOutlet weak var coinImageView: UIImageView!
+    @IBOutlet weak var leadingCellConstraint: NSLayoutConstraint!
+    @IBOutlet var currencyCells: [UILabel]!
     
-    @IBOutlet weak var calcWidthConstraint: NSLayoutConstraint!
+    @IBOutlet var middleConstraints: [NSLayoutConstraint]!
     
-    var thePrice: NSNumber = 0.0
+    @IBOutlet weak var sideBar: UIView!
     
-    var values: [Int] = [149]
+    @IBOutlet weak var sideBarHorizontalSpaceConstraint: NSLayoutConstraint!
     
-    let colors: [UIColor] = [
-        UIColor(hue:0.565, saturation:0.870, brightness:1, alpha: 1),
-        UIColor(hue:0.500, saturation:0.745, brightness:0.7, alpha: 1),
-        UIColor(hue:0.599, saturation:0.813, brightness:0.988, alpha: 1)
-    ]
-    var currencySym: String!
+    @IBOutlet weak var showMenuButton: UIButton!
     
+    @IBOutlet weak var showButtonLayoutConstraint: NSLayoutConstraint!
     
+    @IBOutlet weak var priceStateLabel: UILabel!
+    
+    @IBOutlet weak var arrow: UIImageView!
+    
+    @IBOutlet var flagPlaceholders: [UIImageView]!
+    
+    @IBOutlet weak var aboutButton: UIButton!
+    @IBOutlet var rowsLeftConstraints: [NSLayoutConstraint]!
+    @IBOutlet var rowsRightConstraints: [NSLayoutConstraint]!
+    
+    @IBOutlet weak var updatingLabel: UILabel!
+    
+    @IBOutlet weak var bottomBarView: UIView!
+    
+    @IBOutlet weak var containerViewConstraint: NSLayoutConstraint!
+    
+    @IBOutlet weak var tableViewContainer: UIView!
+    
+    @IBOutlet weak var showTableView: UIButton!
+    
+    var displayLink: CADisplayLink?
+    let timeCycle: Int = 60
+    
+    var isMenuInScreenRect: Bool = false
+    var factor = 1
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        displayLink = CADisplayLink(target: self, selector: Selector("animateCoin"))
+        displayLink!.frameInterval = 60 * timeCycle
         
-        let userDefaults = NSUserDefaults.standardUserDefaults()
+        self.setShadowFor(layer: sideBar.layer)
         
-        let array = userDefaults.objectForKey("Values") as? [Int]
-        if array?.count > 0 {
-            values = array!
+        for label in self.currencyCells {
+            self.setShadowFor(layer: label.layer)
         }
-        let val = values[0]
-        self.getPrice(currencies[val])
-        self.view.backgroundColor = colors[0]
-        self.currencySym = symbols[val]
         
-        self.currencyPicker.delegate = self
-        self.currencyPicker.dataSource = self
-        self.currencyCalculatorTextField.delegate = self
-        self.currencyCalculatorTextField.addTarget(self, action: Selector("textFieldDidChange:"), forControlEvents: UIControlEvents.EditingChanged)
-        hideViewFields()
-    }
-    
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-        self.avergPriceLabel.addObserver(self, forKeyPath: "text", options: .New, context: nil)
-        showFields()
-        self.currencyPicker.reloadAllComponents()
-    }
-    
-    override func observeValueForKeyPath(keyPath: String, ofObject object: AnyObject, change: [NSObject : AnyObject], context: UnsafeMutablePointer<Void>) {
-        self.avergPriceLabel.alpha = 0.0
-        if (keyPath == "text"){
-            UIView.animateWithDuration(0.8, delay: 0.3, options:.CurveEaseIn, animations: { () -> Void in
-                self.avergPriceLabel.alpha = 1.0
-            }, completion: nil)
+        self.leadingCellConstraint.constant -= self.view.bounds.size.height
+        self.sideBarHorizontalSpaceConstraint.constant -= self.view.bounds.size.width
+        
+        for constraint in self.middleConstraints {
+            constraint.constant -= self.view.bounds.size.height
         }
+        
+        self.containerViewConstraint.constant -= self.view.bounds.size.width
+        self.tableViewContainer.layer.zPosition = 100.0
+        self.tableViewContainer.backgroundColor = UIColor(hue:0.574, saturation:0.690, brightness:0.910, alpha: 1)
     }
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-    }
-    
-
-    // MARK: main()
-    
-    func getPrice(currency: String!) {
         
-        let request = NSURLRequest(URL: url!.URLByAppendingPathComponent(currency))
+        displayLink!.addToRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
+        self.animateRows(1)
+    }
+    
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
         
-        NSURLConnection.sendAsynchronousRequest(request, queue: NSOperationQueue.mainQueue()) { (response: NSURLResponse!, data: NSData!, error:NSError!) -> Void in
-            if ((data) != nil) {
-            let JSON = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableLeaves, error:nil) as!NSDictionary
-            self.thePrice = JSON["ask"] as! NSNumber
-                
-            if  self.thePrice != 0.0 {
-                self.currencyPrice.text = self.currencySym + " " + (NSString().stringByAppendingFormat("%.2f", self.thePrice.doubleValue) as String)
-                let avg = JSON["24h_avg"] as? NSNumber;
-                if (avg != nil) {
-                    self.avergPriceLabel.text = self.currencySym + avg!.stringValue
-                }
-            }
-            }else {
-                let alertViewController = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: UIAlertControllerStyle.Alert)
-                let alertDefaultAction = UIAlertAction(title: "Try Again", style: UIAlertActionStyle.Default, handler: { _ in
-                    self.getPrice(currency)
-                })
-                let alertCancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: { _ in
-                })
-                alertViewController.addAction(alertDefaultAction)
-                alertViewController.addAction(alertCancelAction)
-                self.presentViewController(alertViewController, animated: true, completion: nil)
-            }
-        }
-    }
-    
-    
-    // MARK: UIPickerViewDataSource, UIPickerViewDelegate methods
-    
-    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
-        return 2;
-    }
-    
-    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return values.count
-    }
-    
-    
-    func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        self.getPrice(currencies[values[row]])
-        self.currencySym = symbols[values[row]]
-        self.currencyPrice.alpha = 0.0
-        UIView.animateWithDuration(0.8) { () -> Void in
-            self.currencyPrice.alpha = 1.0
-            self.view.backgroundColor = self.colors[row % self.colors.count]
-        }
-        pickerView.selectRow(row, inComponent: 0, animated: true)
-        pickerView.selectRow(row, inComponent: 1, animated: true)
-    }
-    
-    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String! {
-        return currencies[values[row]]
-    }
-    
-    func pickerView(pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusingView view: UIView!) -> UIView {
+        self.animateRows(-1)
+        self.showMenu(self.showMenuButton)
         
-        var frame = CGRectMake(0, 0, 32, 32)
-        if component == 0 {
-            let imgRect = CGRectMake(0, 0, 32, 24)
-            let imageView = UIView()
-            imageView.layer.contents = UIImage(named: "flags")?.CGImage
-            imageView.layer.contentsRect = rectForFlag(value: flags_[values[row]])
-            imageView.layer.contentsGravity = kCAGravityResizeAspect
-            imageView.layer.magnificationFilter = kCAFilterNearest
-            return imageView
-        }
-        frame = CGRectMake(0, 0, 60, 60)
-        let myView  = UILabel(frame: frame)
-        myView.text = currencies[values[row]]
-        myView.font = UIFont(name: "HelveticaNeue-Thin", size: 22)
-        myView.textColor = UIColor.whiteColor()
-        return myView
+        displayLink!.removeFromRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
     }
     
-    
-    //MARK: Helper methods
-    
-    func hideViewFields() {
-        self.currencyPrice.center.x += self.view.bounds.width
-        self.currencyPicker.alpha = 0.0
-        self.currencyPrice.alpha = 0.0
-        self.avergPriceLabel.alpha = 0.0
-        
-        self.currencyCalculatorTextField.alpha = 0.0
-        self.currencyCalculatorLabel.alpha = 0.0
-        self.currencyCalculatorTextField.backgroundColor = self.view.backgroundColor
-    }
-    
-    func showFields() {
-        UIView.animateWithDuration(1.0, animations: { () -> Void in
-            self.currencyPrice.center.x -= self.view.bounds.width
-            self.currencyPrice.alpha = 1.0
-            self.currencyPicker.alpha = 1.0
-            
-            self.currencyCalculatorTextField.alpha = 1.0
-            self.currencyCalculatorTextField.backgroundColor = UIColor.whiteColor()
-        })
-    }
-    
-    
-    //MARK: UITextFieldDelegate
-    func textFieldDidChange(sender: UITextField) {
-        self.currencyCalculatorLabel.text = self.currencySym + " " + (NSString().stringByAppendingFormat("%.2f", self.thePrice.doubleValue * NSString(string: sender.text).doubleValue) as String)
-    }
-    
-    func textFieldShouldEndEditing(textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        return true
-    }
-    
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        return true
-    }
-    
-    func textFieldDidBeginEditing(textField: UITextField) {
-        if !currencyCalculatorTextField.text.isEmpty {
-                self.textFieldDidChange(self.currencyCalculatorTextField);
-        }
-        if (self.currencyCalculatorLabel.text! as NSString).localizedCaseInsensitiveContainsString("nan") || self.currencyCalculatorTextField.text.isEmpty{
-            self.currencyCalculatorLabel.text = "0.0"
-        }
-        
-        UIView.animateWithDuration(0.5, animations: { () -> Void in
-            self.currencyPicker.alpha = 0.0
-            self.currencyPrice.alpha = 0.0
-            self.bitcoinLabel.alpha = 0.0
-            self.addButton.alpha = 0.0
-            self.currencyCalculatorLabel.alpha = 1.0
-            self.removeButton.alpha = 0.0
-            
-            self.calcWidthConstraint.constant = self.view.bounds.width - 32
-            self.view.layoutIfNeeded()
-        })
-        
-        isCalculating = true
-    }
-    
-    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent) {
-        if !isCalculating { return }
-        
-        self.currencyCalculatorTextField.resignFirstResponder()
-        
-        UIView.animateWithDuration(0.5, animations: { () -> Void in
-            self.currencyPicker.alpha = 1.0
-            self.currencyPrice.alpha = 1.0
-            self.bitcoinLabel.alpha = 1.0
-            self.addButton.alpha = 1.0
-            self.currencyCalculatorLabel.alpha = 0.0
-            self.removeButton.alpha = 1.0
-            
-            self.calcWidthConstraint.constant = self.view.bounds.width / 2 - 16
-            self.view.layoutIfNeeded()
-        })
-        
-        isCalculating = false
-    }
-    
-    //MARK: IBActions
-    @IBAction func removeElement(sender: UIButton) {
-        let index = self.currencyPicker.selectedRowInComponent(0)
-        self.getPrice(currencies[values[self.currencyPicker.selectedRowInComponent(0)]])
-        if values.count > 1 { values.removeAtIndex(index) }
-        let userDefaults = NSUserDefaults.standardUserDefaults()
-        userDefaults.setObject(self.values, forKey: "Values")
-        self.currencyPicker.reloadAllComponents()
-        
-    }
-    
-    @IBAction func unwindToSegue(segue: UIStoryboardSegue) {
-        
-    }
-    
-    //MARK: Memory warnings
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         println(__FUNCTION__)
     }
+    
+    
+    
+    //MARK: Animation
+    func animateRows(direction: CGFloat)
+    {
+        var delay:Double = 0.0
+        
+        UIView.animateWithDuration(1.0, delay: delay, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.7, options: .CurveEaseIn, animations: { _ in
+            delay = 0.1;
+            self.leadingCellConstraint.constant += (self.view.bounds.size.height * direction)
+            self.view.layoutIfNeeded()
+        }, completion: nil)
+        
+        for constraint in self.middleConstraints {
+            UIView.animateWithDuration(1.0, delay: delay, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.7, options: .CurveEaseIn, animations: { _ in
+                delay += 0.2;
+                constraint.constant += (self.view.bounds.size.height * direction)
+                self.view.layoutIfNeeded()
+                }, completion: nil)
+        }
+    }
+    
+    func animateCoin()
+    {
+        self.updateUI()
+        
+        var perspective = CATransform3DIdentity
+        perspective.m34 = -1.0/500.0
+        
+        UIView.animateKeyframesWithDuration(3.0, delay: 0.0, options: UIViewKeyframeAnimationOptions.CalculationModePaced, animations: { _ in
+            UIView.addKeyframeWithRelativeStartTime(0.0, relativeDuration: 0.0, animations: { () -> Void in
+                self.coinImageView.layer.transform = perspective;
+                self.coinImageView.layer.transform = CATransform3DMakeRotation(CGFloat(M_PI_4), 0, 1, 0);
+            })
+            
+            UIView.addKeyframeWithRelativeStartTime(0.0, relativeDuration: 0.0, animations: { () -> Void in
+                self.coinImageView.layer.transform = perspective;
+                self.coinImageView.layer.transform = CATransform3DMakeRotation(CGFloat(-M_PI_4), 0, 1, 0);
+            })
+            
+            UIView.addKeyframeWithRelativeStartTime(0.0, relativeDuration: 0.0, animations: { () -> Void in
+                self.coinImageView.layer.transform = perspective;
+                self.coinImageView.layer.transform = CATransform3DMakeRotation(0, 0, 1, 0);
+            })
+            
+        }, completion: nil)
+    }
+    
+    func updateUI() {
+        let currencyArray: [String] = ["USD", "EUR", "RUB"]
+        let flagNumbers: [UInt8] = [228, 7, 193]
+        
+        for index in 0...(currencyArray.count - 1) {
+            let label = self.currencyCells[index]
+            
+            ANDownloader.loadCurrency(currencyArray[index], handler: { (num: NSNumber) -> () in
+                label.text = num.stringValue
+                
+                let imgView = self.flagPlaceholders[index]
+                imgView.image = UIImage(named: "flags")
+                let flagNum = Double(flagNumbers[index]) * 1.0 * 32.0 / (246.0 * 32.0)
+                imgView.layer.contentsRect = CGRectMake(0, CGFloat(flagNum), 1.0, 1.0/246.0);
+                
+                imgView.layer.contentsGravity = kCAGravityResizeAspect;
+                imgView.layer.magnificationFilter = kCAFilterNearest;
+            })
+            
+            ANDownloader.getAveragePrice({ (avg: String) -> () in
+                self.priceStateLabel.text = avg
+                if contains(avg, "-") {
+                    self.arrow.image = UIImage(named:"redArrow")
+                }else {
+                    self.arrow.image = UIImage(named:"blueArrow")
+                }
+            })
+        }
+        
+        self.blink()
+    }
+    
+    
+    //MARK: IBActions
+    @IBAction func showMenu(sender: UIButton) {
+        
+        if isLeftOnScreen {
+            self.showTableView(self.showTableView)
+        }
+        
+        UIView.animateWithDuration(0.5, animations: { () -> Void in
+            sender.transform = CGAffineTransformMakeRotation(CGFloat(M_PI_4 + M_PI) * CGFloat(-self.factor))
+            
+            if self.factor == 1 {
+                self.isMenuInScreenRect = true
+                self.view.backgroundColor = UIColor(hue:0.564, saturation:0.242, brightness:0.631, alpha: 1)
+                self.bottomBarView.backgroundColor = UIColor(hue:0.564, saturation:0.310, brightness:0.511, alpha: 1)
+                self.showButtonLayoutConstraint.constant += self.sideBar.bounds.size.width;
+                self.sideBarHorizontalSpaceConstraint.constant += self.view.bounds.size.width;
+                self.moveRows(1)
+            }else {
+                self.isMenuInScreenRect = false
+                self.view.backgroundColor = UIColor(hue:0.574, saturation:0.690, brightness:0.910, alpha: 1)
+                self.bottomBarView.backgroundColor = UIColor(hue:0.565, saturation:0.471, brightness:0.341, alpha: 1)
+                self.showButtonLayoutConstraint.constant -= self.sideBar.bounds.size.width;
+                self.sideBarHorizontalSpaceConstraint.constant -= self.view.bounds.size.width;
+                self.moveRows(-1)
+            }
+            
+            self.view.layoutIfNeeded()
+        })
+        
+        self.factor = factor == 1 ? 0 : 1
+    }
+    
+    @IBAction func unwindToSegue(sender: UIStoryboardSegue) {
+        
+    }
+    
+    @IBAction func showTableView(sender: UIButton) {
+        if !isLeftOnScreen {
+            UIView.animateWithDuration(0.4, animations: { () -> Void in
+                self.containerViewConstraint.constant += self.view.bounds.size.width
+                self.moveRows(-1)
+                self.view.layoutIfNeeded()
+            })
+        
+            if isMenuInScreenRect { self.showMenu(self.showMenuButton) }
+            isLeftOnScreen = true
+        }else {
+
+            UIView.animateWithDuration(0.4, animations: { () -> Void in
+                self.containerViewConstraint.constant -= self.view.bounds.size.width
+                self.moveRows(1)
+                self.view.layoutIfNeeded()
+            })
+            isLeftOnScreen = false
+            
+        }
+        
+    }
+    
+    
+    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent) {
+        
+        if isMenuInScreenRect { self.showMenu(self.showMenuButton) }
+        
+        if isLeftOnScreen { self.showTableView(self.showTableView) }
+    }
+    
+    
+    //MARK: Helpers
+    func moveRows(direction: CGFloat) {
+        var delay:Double = 0.1
+        
+        for constraint in self.rowsLeftConstraints {
+            delay += 1.0;
+            UIView.animateWithDuration(0.7, delay: delay, options:.CurveEaseIn, animations: { () -> Void in
+                constraint.constant += (self.sideBar.bounds.size.width * direction)
+            }, completion: nil)
+        }
+        
+        for constraint in self.rowsRightConstraints {
+            
+            UIView.animateWithDuration(0.7, delay: delay, options:.CurveEaseIn, animations: { () -> Void in
+                constraint.constant -= (self.sideBar.bounds.size.width * direction)
+                }, completion: nil)
+            
+        }
+    }
+    
+    func blink() {
+        UIView.animateKeyframesWithDuration(3.0, delay: 0.0, options: UIViewKeyframeAnimationOptions.CalculationModePaced, animations: { () -> Void in
+            
+            UIView.addKeyframeWithRelativeStartTime(0.0, relativeDuration: 0.0, animations: { () -> Void in
+                self.updatingLabel.alpha = 1.0
+            })
+            UIView.addKeyframeWithRelativeStartTime(0.0, relativeDuration: 0.0, animations: { () -> Void in
+                self.updatingLabel.alpha = 0.2
+            })
+            UIView.addKeyframeWithRelativeStartTime(0.0, relativeDuration: 0.0, animations: { () -> Void in
+                self.updatingLabel.alpha = 1.0
+            })
+            UIView.addKeyframeWithRelativeStartTime(0.0, relativeDuration: 0.0, animations: { () -> Void in
+                self.updatingLabel.alpha = 0.0
+            })
+            
+            }, completion: nil)
+    }
+    
+    func setShadowFor(#layer: CALayer) {
+        layer.shadowColor = UIColor(hue:0.565, saturation:0.471, brightness:0.341, alpha: 1).CGColor
+        layer.shadowOffset = CGSizeMake(2, 2)
+        layer.shadowOpacity = 3.0;
+        layer.shadowRadius = 1.5;
+    }
+    
+    override func touchesMoved(touches: Set<NSObject>, withEvent event: UIEvent) {
+        let touch = touches.first as! UITouch
+        let touchedView = touch.view
+        
+        //        if touchedView.isKindOfClass(UITableViewCell) {
+        println(__FUNCTION__)
+        //        }
+    }
+
 }
+
 

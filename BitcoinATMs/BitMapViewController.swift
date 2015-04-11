@@ -139,7 +139,7 @@ class BitMapViewController: UIViewController, MKMapViewDelegate, CLLocationManag
                 let item = BitMapItem(type: value["type"] as! String,
                     latitude: NSDecimalNumber(string: value["lat"] as? String),
                     longitude: NSDecimalNumber(string: value["long"] as? String),
-                    url: value["url"] as! String,
+                    url: value["url"]as! String,
                     isTwoWay: twValue == 1 ? true : false,
                     bitTypes: value["cryptos"] as! NSDictionary
                 )

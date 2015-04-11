@@ -25,4 +25,29 @@ class ANDownloader: NSObject {
             }
         }).resume()
     }
+    
+    class func loadCurrency(currency: String, handler: (NSNumber)->()) {
+        NSURLConnection.sendAsynchronousRequest(NSURLRequest(URL: url.URLByAppendingPathComponent(currency)), queue: NSOperationQueue.mainQueue()) { (response: NSURLResponse!, data: NSData!, error: NSError!) -> Void in
+            if data != nil && error == nil {
+                var currencyInfo = NSJSONSerialization.JSONObjectWithData(data, options: .AllowFragments, error: nil) as! NSDictionary?
+                if currencyInfo != nil {
+                    handler((currencyInfo!["ask"] as! NSNumber))
+                }
+            }
+        }
+    }
+    
+    class func getAveragePrice(handler: (String)->()) {
+        NSURLConnection.sendAsynchronousRequest(NSURLRequest(URL: url.URLByAppendingPathComponent("USD")), queue: NSOperationQueue.mainQueue()) { (response: NSURLResponse!, data: NSData!, error: NSError!) -> Void in
+            if data != nil && error == nil {
+                var currencyInfo = NSJSONSerialization.JSONObjectWithData(data, options: .AllowFragments, error: nil) as! NSDictionary?
+                if currencyInfo != nil {
+                    let price = currencyInfo!["ask"] as! NSNumber!
+                    let avg = currencyInfo!["24h_avg"] as! NSNumber!
+                    let str = NSString(format: "%.2f", price.doubleValue * 100 / avg.doubleValue - 100.0)
+                    handler("\(str)%")
+                }
+            }
+        }
+    }
 }

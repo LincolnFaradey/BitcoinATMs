@@ -93,7 +93,7 @@ class DetailsViewController: UIViewController {
             })
             }, completion: nil);
     }
-    
+
     func animateAppearence(imageView: UIImageView, delay: Double) {
         UIView.animateWithDuration(1.5, delay: delay, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
             imageView.alpha = 1.0
