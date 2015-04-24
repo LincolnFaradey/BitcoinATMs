@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7F20420A1ADC1F630017131D /* ANCalculatorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F2042091ADC1F630017131D /* ANCalculatorViewController.swift */; };
+		7F20420C1ADC21010017131D /* CurrenciesTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F20420B1ADC21010017131D /* CurrenciesTableViewController.swift */; };
 		7F2D6B9D1AC11F0A00525E03 /* BitcoinATMsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F2D6B9C1AC11F0A00525E03 /* BitcoinATMsTests.swift */; };
 		7F2D6BB31AC11F7E00525E03 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F2D6BA61AC11F7E00525E03 /* ViewController.swift */; };
 		7F2D6BB51AC11F7E00525E03 /* AdditionalCurrenciesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F2D6BA81AC11F7E00525E03 /* AdditionalCurrenciesViewController.swift */; };
@@ -20,6 +22,7 @@
 		7F2D6BBD1AC11F7E00525E03 /* ANDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F2D6BB01AC11F7E00525E03 /* ANDownloader.swift */; };
 		7F2D6BBE1AC11F7E00525E03 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7F2D6BB11AC11F7E00525E03 /* Images.xcassets */; };
 		7F2D6BBF1AC11F7E00525E03 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F2D6BB21AC11F7E00525E03 /* AppDelegate.swift */; };
+		7F85E0071AE49750004EF925 /* ANSharedManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F85E0061AE49750004EF925 /* ANSharedManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,6 +36,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7F2042091ADC1F630017131D /* ANCalculatorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ANCalculatorViewController.swift; sourceTree = "<group>"; };
+		7F20420B1ADC21010017131D /* CurrenciesTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CurrenciesTableViewController.swift; sourceTree = "<group>"; };
 		7F2D6B811AC11F0A00525E03 /* BitcoinATMs.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BitcoinATMs.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F2D6B851AC11F0A00525E03 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7F2D6B961AC11F0A00525E03 /* BitcoinATMsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BitcoinATMsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -50,6 +55,7 @@
 		7F2D6BB01AC11F7E00525E03 /* ANDownloader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ANDownloader.swift; sourceTree = "<group>"; };
 		7F2D6BB11AC11F7E00525E03 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		7F2D6BB21AC11F7E00525E03 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		7F85E0061AE49750004EF925 /* ANSharedManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ANSharedManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,7 +97,10 @@
 		7F2D6B831AC11F0A00525E03 /* BitcoinATMs */ = {
 			isa = PBXGroup;
 			children = (
+				7F85E0061AE49750004EF925 /* ANSharedManager.swift */,
 				7F2D6BA61AC11F7E00525E03 /* ViewController.swift */,
+				7F20420B1ADC21010017131D /* CurrenciesTableViewController.swift */,
+				7F2042091ADC1F630017131D /* ANCalculatorViewController.swift */,
 				7F2D6BA81AC11F7E00525E03 /* AdditionalCurrenciesViewController.swift */,
 				7F2D6BA91AC11F7E00525E03 /* WebViewController.swift */,
 				7F2D6BAA1AC11F7E00525E03 /* BitMapViewController.swift */,
@@ -239,8 +248,11 @@
 				7F2D6BB51AC11F7E00525E03 /* AdditionalCurrenciesViewController.swift in Sources */,
 				7F2D6BB61AC11F7E00525E03 /* WebViewController.swift in Sources */,
 				7F2D6BBD1AC11F7E00525E03 /* ANDownloader.swift in Sources */,
+				7F20420A1ADC1F630017131D /* ANCalculatorViewController.swift in Sources */,
+				7F85E0071AE49750004EF925 /* ANSharedManager.swift in Sources */,
 				7F2D6BB91AC11F7E00525E03 /* DetailsViewController.swift in Sources */,
 				7F2D6BB71AC11F7E00525E03 /* BitMapViewController.swift in Sources */,
+				7F20420C1ADC21010017131D /* CurrenciesTableViewController.swift in Sources */,
 				7F2D6BBC1AC11F7E00525E03 /* CurrenciesList.swift in Sources */,
 				7F2D6BBF1AC11F7E00525E03 /* AppDelegate.swift in Sources */,
 				7F2D6BB81AC11F7E00525E03 /* BitPointAnnotation.swift in Sources */,
@@ -334,6 +346,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -343,6 +356,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -375,6 +389,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Release;
 		};

@@ -32,9 +32,9 @@ class BitMapViewController: UIViewController, MKMapViewDelegate, CLLocationManag
         locationManager.delegate = self
         distanceLabel.alpha = 0.0
         locationManager.requestWhenInUseAuthorization()
-        locationManager.requestAlwaysAuthorization()
+
         
-        //TEST
+        //TODO: Remove before deploy
         let item = BitMapItem(type: "BlaBLa", latitude: NSDecimalNumber(string:"55.776062"), longitude: NSDecimalNumber(string:"37.572070"), url: "http://google.com", isTwoWay: true, bitTypes: NSDictionary(dictionary: ["bitcoin" : "1",
             "litecoin" : "1",
             "dogecoin" : "1"]))
